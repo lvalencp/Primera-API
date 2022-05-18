@@ -28,7 +28,19 @@ class ClienteController extends Controller
     public function store(Request $request)
     {
         //
-        return Cliente::create($request->all());
+        //return Cliente::create($request->all());
+        $existente = Cliente::where('correo', $request->correo)->get ();
+
+        if($existente->count()!=0){
+            return 'Error: email duplicado';
+        }
+        $cliente=new Cliente;
+        $cliente->cod_cliente=$request->cod_cliente;
+        $cliente->nombres=$request->nombres;
+        $cliente->primer_apellido=$request->primer_apellido;
+        $cliente->segundo_apellido=$request->segundo_apellido;
+        $cliente->correo=$request->correo;
+        $cliente->save ();
     }
 
     /**
@@ -37,10 +49,17 @@ class ClienteController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($dato)
     {
-        //
-        return Cliente::find($id);
+        //Cliente::find($id);
+        //return Cliente::where ('id', $id) ->get ();
+        $field = filter_var ($dato, FILTER_VALIDATE_EMAIL) ? 'correo':'id';
+        $cliente=Cliente::where ($field, $dato) ->get();
+
+        if ($cliente->count() == 0){
+            return '¡ERROR! Correo Inexistente';
+        }
+        return $cliente;
     }
 
 
